@@ -1,7 +1,6 @@
 
 import Bagian from "@/components/Bagian";
-import DaftarItem from "@/components/DaftarItem";
-import { daftarItem } from "@/lib/data";
+import ItemTerbaru from "@/components/ItemTerbaru";
 
 export default function Beranda() {
   return (
@@ -69,9 +68,9 @@ export default function Beranda() {
         </aside>
       </div>
 
-      <Bagian id="terbaru" judul="Item Terbaru">
-        <DaftarItem items={daftarItem.slice(0, 3)} />
-      </Bagian>
+        <Bagian id="terbaru" judul="Item Terbaru">
+             <ItemTerbaru />
+        </Bagian>
 
       <Bagian id="kontak" judul="Hubungi Kami">
         <p className="max-w-2xl leading-7 text-gray-700">

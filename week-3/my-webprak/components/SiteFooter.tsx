@@ -9,7 +9,7 @@ export default function SiteFooter({
   return (
     <footer className="border-t">
       <div className="mx-auto max-w-6xl p-4 text-sm text-gray-600">
-        &copy; {new Date().getFullYear()} {namaProduk}
+        &copy; 2026 {namaProduk}. All rights reserved.
       </div>
     </footer>
   );

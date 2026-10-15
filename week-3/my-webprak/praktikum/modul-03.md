@@ -1,29 +1,18 @@
-# Dokumentasi Teknis Modul 3
+# Dokumen Teknis Modul 3 — TypeScript dan Komponen React
 
-## 1. Deskripsi Proyek
+**Nama/NIM:** Rizqy hergiansyah / 105224010 
+**Repositori:** https://github.com/hergiansyah24/praktikum-pemweb-/tree/main/week-3
 
-Project ini merupakan aplikasi web **Sistem Pemantauan Energi & Lingkungan Kampus** yang dibuat menggunakan Next.js, React, dan TypeScript. Aplikasi menampilkan informasi mengenai energi, lingkungan, dan fasilitas kampus.
+## 1. Tipe Data Produk
 
-Pada modul ini, pengembangan berfokus pada penerapan tipe data TypeScript, pembuatan komponen React yang dapat digunakan kembali, pengelolaan state, serta fitur pencarian dan filter data.
-
-## 2. Tipe Data Produk
-
-### 2.1 Union Type dan Interface
-
-Pada file `lib/tipe.ts`, aplikasi menggunakan union type `Kategori` untuk membatasi kategori item yang diperbolehkan.
+Tipe data aplikasi didefinisikan pada file `lib/tipe.ts`. Aplikasi menggunakan union type `Kategori` dan interface `Item` untuk menjaga konsistensi struktur data.
 
 ```typescript
 export type Kategori =
   | "energi"
   | "lingkungan"
   | "kampus";
-```
 
-Union type tersebut memastikan nilai kategori hanya dapat menggunakan salah satu dari tiga pilihan yang ditentukan. Dengan demikian, kesalahan penulisan kategori dapat dideteksi melalui pemeriksaan tipe TypeScript.
-
-Interface `Item` digunakan untuk menentukan struktur data setiap item.
-
-```typescript
 export interface Item {
   id: number;
   judul: string;
@@ -34,45 +23,17 @@ export interface Item {
 }
 ```
 
-Properti `id`, `judul`, `kategori`, `deskripsi`, dan `tersedia` wajib tersedia. Sementara itu, properti `gambar` bersifat opsional karena menggunakan tanda `?`.
+Union type `Kategori` membatasi nilai kategori menjadi `"energi"`, `"lingkungan"`, atau `"kampus"`. Dengan demikian, kesalahan penulisan kategori dapat dideteksi oleh TypeScript.
 
-Penggunaan interface membantu menjaga konsistensi struktur data yang digunakan oleh komponen aplikasi.
+Interface `Item` menentukan struktur data setiap item. Properti `id`, `judul`, `kategori`, `deskripsi`, dan `tersedia` wajib diisi. Properti `gambar` bersifat opsional karena tidak semua item harus memiliki gambar. Tanda `?` digunakan untuk menunjukkan bahwa properti tersebut boleh tidak tersedia.
 
-### 2.2 Pemetaan Kategori Menggunakan Record
+Pada `components/KartuItem.tsx`, `Record<Kategori, string>` digunakan untuk memetakan kategori ke label yang ditampilkan. Penggunaan tipe tersebut membantu memastikan setiap kategori mempunyai label bertipe string.
 
-Pada file `components/KartuItem.tsx`, aplikasi menggunakan `Record<Kategori, string>` untuk memetakan kategori ke label yang ditampilkan.
+## 2. Struktur Komponen
 
-```typescript
-const labelKategori: Record<Kategori, string> = {
-  energi: "Energi",
-  lingkungan: "Lingkungan",
-  kampus: "Kampus",
-};
-```
+### 2.1 Diagram Pohon Komponen
 
-`Record<Kategori, string>` memastikan setiap kategori yang didefinisikan pada `Kategori` memiliki label bertipe string. Jika kategori baru ditambahkan, pemetaan label juga perlu diperbarui agar tetap sesuai dengan tipe yang ditentukan.
-
-## 3. Struktur Komponen
-
-### 3.1 Struktur dan Tanggung Jawab Komponen
-
-Aplikasi memisahkan beberapa bagian ke dalam komponen agar kode lebih mudah dibaca, digunakan kembali, dan dipelihara.
-
-| File atau komponen | Props atau data | Fungsi |
-|---|---|---|
-| `app/page.tsx` | Mengimpor `daftarItem` | Menyusun halaman beranda dan menampilkan tiga item pertama. |
-| `app/katalog/page.tsx` | Mengimpor `daftarItem` | Menyediakan halaman pada rute `/katalog`. |
-| `components/Bagian.tsx` | `id`, `judul`, `children` | Membungkus konten ke dalam bagian halaman. |
-| `components/DaftarItem.tsx` | `items: Item[]` | Menampilkan daftar serta menangani pencarian dan filter kategori. |
-| `components/KartuItem.tsx` | `item: Item` | Menampilkan kategori, judul, deskripsi, dan status ketersediaan item. |
-| `components/SiteHeader.tsx` | Props sesuai definisi komponen | Menampilkan nama produk dan navigasi. |
-| `components/SiteFooter.tsx` | Props nama produk | Menampilkan informasi footer. |
-| `lib/tipe.ts` | `Kategori` dan `Item` | Mendefinisikan tipe data yang digunakan aplikasi. |
-| `lib/data.ts` | Array `daftarItem` | Menyediakan data item statis. |
-
-### 3.2 Pohon Komponen
-
-Berdasarkan kode `app/page.tsx` dan `components/DaftarItem.tsx` yang diperiksa, struktur utama halaman beranda adalah sebagai berikut.
+Berdasarkan struktur kode yang diperiksa, pohon komponen utama halaman beranda adalah sebagai berikut.
 
 ```text
 app/page.tsx (Server Component)
@@ -83,166 +44,178 @@ app/page.tsx (Server Component)
 └── Bagian — Hubungi Kami
 ```
 
-Halaman beranda tidak menggunakan direktif `"use client"`, sehingga merupakan Server Component secara default. Komponen `DaftarItem` menggunakan `"use client"` karena membutuhkan `useState` dan event handler untuk menangani interaksi pengguna.
+`app/page.tsx` merupakan Server Component secara default karena tidak menggunakan direktif `"use client"`. Komponen `DaftarItem` merupakan Client Component karena menggunakan `useState` dan event handler untuk menangani pencarian serta filter kategori.
 
-Komponen `KartuItem` tidak menggunakan hook atau event handler interaktif pada kode yang diperiksa. Komponen ini dapat digunakan sebagai bagian dari antarmuka yang menerima data melalui props.
+Pohon tersebut menggambarkan bagian utama halaman beranda, bukan keseluruhan komponen pada semua halaman.
 
-**Catatan:** pohon di atas menggambarkan bagian utama halaman beranda yang telah diperiksa. Struktur lengkap seluruh komponen, termasuk header, footer, dan halaman katalog, perlu disesuaikan dengan susunan aktual file yang digunakan.
+### 2.2 Tabel Komponen
 
-### 3.3 Alasan Pemisahan Komponen
+| Nama komponen/file | Props atau data | Tempat digunakan dan fungsi |
+|---|---|---|
+| `app/page.tsx` | Mengimpor `daftarItem` | Halaman beranda dan penyusun bagian halaman. |
+| `app/katalog/page.tsx` | Mengimpor `daftarItem` | Halaman pada rute `/katalog`. |
+| `components/Bagian.tsx` | `id`, `judul`, `children` | Membungkus konten setiap bagian halaman. |
+| `components/DaftarItem.tsx` | `items: Item[]` | Menampilkan daftar item serta mengelola pencarian dan filter. |
+| `components/KartuItem.tsx` | `item: Item` | Menampilkan kategori, judul, deskripsi, dan status ketersediaan satu item. |
+| `components/SiteHeader.tsx` | Sesuai definisi props komponen | Menampilkan header dan navigasi. |
+| `components/SiteFooter.tsx` | Nama produk | Menampilkan informasi footer. |
+| `lib/tipe.ts` | `Kategori` dan `Item` | Mendefinisikan tipe data yang digunakan aplikasi. |
+| `lib/data.ts` | Array `daftarItem` | Menyediakan data item statis. |
 
-Pemisahan komponen dilakukan berdasarkan tanggung jawab masing-masing:
+Pemisahan komponen dilakukan agar setiap komponen memiliki tanggung jawab yang jelas. `DaftarItem` menangani interaksi, sedangkan `KartuItem` berfokus pada penyajian informasi item.
 
-1. `Bagian` digunakan untuk menyusun bagian halaman dengan struktur yang konsisten.
-2. `DaftarItem` menangani pencarian, filter, dan daftar hasil.
-3. `KartuItem` berfokus pada penyajian informasi satu item.
-4. `lib/tipe.ts` menyimpan definisi tipe agar dapat digunakan oleh beberapa komponen.
-5. `lib/data.ts` memisahkan data item dari struktur tampilan.
+## 3. State dan Interaksi
 
-Pendekatan tersebut membantu mengurangi pengulangan kode dan mempermudah pemeliharaan aplikasi.
+Komponen `components/DaftarItem.tsx` menggunakan `useState` untuk menyimpan kata kunci pencarian dan kategori filter.
 
-## 4. State dan Interaksi
-
-### 4.1 Penggunaan useState
-
-Komponen `components/DaftarItem.tsx` menggunakan `useState` untuk menyimpan kata kunci pencarian dan kategori filter yang dipilih.
-
-```typescript
+```tsx
 type Filter = Kategori | "semua";
 
 const [kataKunci, setKataKunci] = useState("");
 const [filter, setFilter] = useState<Filter>("semua");
 ```
 
-State `kataKunci` menyimpan teks yang dimasukkan pengguna. State `filter` menyimpan kategori yang dipilih, yaitu `"semua"`, `"energi"`, `"lingkungan"`, atau `"kampus"`.
+State `kataKunci` menyimpan teks pencarian yang dimasukkan pengguna. State `filter` menyimpan kategori yang dipilih. Nilai awal filter adalah `"semua"`.
 
-### 4.2 Alur Interaksi
+Alur interaksi berlangsung sebagai berikut:
 
-Pencarian dan filter diterapkan menggunakan metode `filter()` pada array `items`.
+1. Pengguna mengetik kata kunci pada input pencarian.
+2. Event `onChange` memanggil `setKataKunci` untuk memperbarui state.
+3. Pengguna memilih tombol kategori, kemudian event `onClick` memanggil `setFilter`.
+4. React merender ulang komponen menggunakan state terbaru.
+5. Daftar item disaring berdasarkan kata kunci dan kategori yang dipilih.
+6. Jika tidak ada item yang cocok, aplikasi menampilkan pesan `Tidak ada item yang sesuai.`
 
-Data disaring berdasarkan dua kondisi:
+Pencarian menggunakan `toLowerCase()` sehingga tidak membedakan huruf besar dan kecil. Jumlah hasil ditampilkan menggunakan elemen `aria-live="polite"`, sedangkan tombol kategori menggunakan `aria-pressed` untuk menunjukkan pilihan yang aktif.
 
-1. Judul item mengandung kata kunci pencarian.
-2. Kategori item sesuai dengan filter yang dipilih, atau filter bernilai `"semua"`.
+### State dan Interaksi
 
-Pencarian tidak membedakan huruf besar dan kecil karena judul dan kata kunci diubah menjadi huruf kecil menggunakan `toLowerCase()`.
+Komponen `DaftarItem` menggunakan React `useState` untuk menyimpan kata kunci pencarian dan kategori filter. State awal `kataKunci` berupa string kosong (`""`), sedangkan state `filter` bernilai `"semua"`.
 
-Input pencarian menggunakan `value` dan `onChange`. Saat pengguna mengetik, `setKataKunci` memperbarui state. Tombol kategori menggunakan `onClick` untuk memanggil `setFilter` sesuai pilihan pengguna.
+Ketika pengguna mengetik pada kolom pencarian, event `onChange` memperbarui state `kataKunci`. Ketika pengguna memilih tombol kategori, event `onClick` memperbarui state `filter`. Perubahan state menyebabkan React melakukan render ulang sehingga daftar item yang ditampilkan menyesuaikan kata kunci dan kategori yang dipilih.
 
-Perubahan state menyebabkan React merender ulang komponen agar hasil yang ditampilkan mengikuti kata kunci dan kategori terbaru.
+### Bukti React Developer Tools
 
-### 4.3 Conditional Rendering dan Aksesibilitas
+<img src="bukti/bukti_state_daftaritem.png" alt="Bukti state daftar item pada komponen yang terdapat DaftarItem, props, dan hooks" width="700">
 
-Jika tidak ada item yang sesuai, komponen menampilkan pesan:
+### Bukti interaksi aplikasi dari pencarian:
 
-`Tidak ada item yang sesuai.`
+<img src="bukti/Bukti_interaksi_pencarian.png" alt="Bukti interaksi aplikasi dari pencaharian" width="700">
 
-Jumlah item yang ditemukan ditampilkan melalui elemen dengan atribut `aria-live="polite"` agar perubahan informasi dapat diketahui oleh teknologi bantu.
+### Bukti interaksi aplikasi filter katalog:
 
-Tombol kategori menggunakan `aria-pressed` untuk menunjukkan kategori yang sedang aktif. Daftar item menggunakan `key={item.id}` agar React dapat mengidentifikasi setiap item berdasarkan ID-nya.
+<img src="bukti/Bukti _interaksi_filter_kategori.png" alt="Bukti interaksi filter kategori pada katalog" width="700">
 
-Pada `components/KartuItem.tsx`, *conditional rendering* juga digunakan untuk menampilkan pesan `Sementara tidak tersedia` apabila nilai `item.tersedia` adalah `false`.
+### Bukti Verifikasi
 
-### 4.4 Bukti Interaksi
+Screenshot terminal pemeriksaan TypeScript dan ESLint disimpan pada praktikum/bukti/verifikasi_typescript_ESLint.png.
 
-**Bukti yang perlu dilampirkan jika diwajibkan dalam instruksi praktikum:**
+Pemeriksaan TypeScript dilakukan menggunakan perintah `npx tsc --noEmit`. Setelah perintah dijalankan, terminal kembali ke prompt tanpa menampilkan pesan error.
 
-- Screenshot aplikasi ketika daftar item ditampilkan.
-- Screenshot setelah pencarian dilakukan.
-- Screenshot setelah kategori filter dipilih.
-- Screenshot React Developer Tools pada tab Components yang memperlihatkan props dan state `DaftarItem`.
+Pemeriksaan kode menggunakan ESLint dilakukan dengan perintah `npm run lint`. Output menunjukkan bahwa script `eslint` dijalankan dan selesai tanpa menampilkan pesan error.
 
-Screenshot harus diambil langsung dari aplikasi yang dijalankan dan hasil pengujian yang benar-benar dilakukan.
+Berdasarkan output terminal tersebut, kedua pemeriksaan selesai tanpa melaporkan error. Screenshot terminal dilampirkan sebagai bukti verifikasi.
 
-## 5. Pengambilan Data
+## ## 4. Pengambilan Data
 
-### 5.1 Sumber Data
+Komponen `ItemTerbaru` mengambil data item menggunakan Fetch API dari file `public/data/item.json`. File JSON tersebut berisi data item dengan struktur yang sesuai dengan interface `Item` pada `lib/tipe.ts`.
 
-Berdasarkan kode yang diperiksa, data item masih berasal dari array statis yang diimpor dari `lib/data.ts`.
+Permintaan data dilakukan menggunakan kode berikut:
 
-Pada halaman beranda, data dikirim ke komponen `DaftarItem` menggunakan:
+```tsx
+const res = await fetch("/data/item.json");
 
-```typescript
-<DaftarItem items={daftarItem.slice(0, 3)} />
+if (!res.ok) {
+  throw new Error(`HTTP ${res.status}`);
+}
+
+const data: Item[] = await res.json();
 ```
 
-Kode tersebut mengambil tiga item pertama dari array `daftarItem`, kemudian mengirimkannya melalui props `items`.
+Jika permintaan berhasil, data disimpan ke state dan tiga item pertama ditampilkan pada halaman. Jika permintaan gagal, aplikasi menampilkan pesan bahwa data tidak berhasil dimuat.
 
-### 5.2 Penyesuaian terhadap Instruksi Asisten Praktikum
+### 4.1 Bukti Network dan Respons JSON
 
-Sesuai arahan asisten praktikum, file `public/data/item.json` dan `components/ItemTerbaru.tsx` tidak dibuat sebagai bagian dari implementasi ini.
+Permintaan `/data/item.json` diperiksa melalui panel Network pada browser. Hasil pengujian menunjukkan respons HTTP `200 OK`, sedangkan tab Response menampilkan data item dalam format JSON.
 
-Dengan demikian, dokumentasi ini menjelaskan pengambilan data dari `lib/data.ts` yang memang digunakan dalam kode. Implementasi Fetch API, status loading, dan penanganan kegagalan permintaan belum dapat dinyatakan selesai berdasarkan kode yang telah diperiksa.
+**Bukti Network:**
 
-Apabila instruksi pengujian Fetch API tetap diwajibkan secara terpisah, bagian tersebut perlu dikonfirmasi kepada asisten praktikum agar dokumentasi sesuai dengan ketentuan penilaian.
+<img src="bukti/network-item-json.png" alt="Bukti permintaan item.json" width="700">
 
-## 6. Verifikasi
+**Bukti respons JSON:**
 
-### 6.1 Pemeriksaan TypeScript
+<img src="bukti/bukti  yang menampilkan status 200 OK.png" alt="Bukti permintaan item.json" width="700">
 
-Perintah yang dijalankan:
+### 4.2 Hasil Pengujian
+
+| Kondisi | Skenario pengujian | Hasil |
+|---|---|---|
+| Memuat (*loading*) | Memantau tampilan ketika permintaan data sedang berlangsung. | Pesan `Memuat data…` ditampilkan sebelum proses selesai. |
+| Berhasil (*success*) | Meminta data dari `/data/item.json`. | Data berhasil diambil dan tiga item ditampilkan. |
+| Gagal (*failure*) | Mengubah URL permintaan sementara menjadi `/data/item-tidak-ada.json`. | Aplikasi menampilkan pesan `Data gagal dimuat. Muat ulang halaman.` |
+
+### 4.3 Bukti Pengujian
+
+**Bukti permintaan data berhasil:**
+
+<img src="bukti/bukti  yang menampilkan status 200 OK.png" alt="Bukti permintaan item.json" width="700">
+
+**Bukti kondisi gagal:**
+
+<img src="bukti/bukti 404 notfound fetch pada item.json.png" alt="Bukti permintaan item.json" width="700">
+
+**Bukti kondisi loading:**
+
+<img src="bukti/bukti loading fetch pada item.json.png" alt="bukti loading fetch pada item.json" width="700">
+
+Pengujian kegagalan dilakukan dengan mengubah URL fetch untuk sementara. Setelah pengujian selesai, URL dikembalikan menjadi `/data/item.json` agar aplikasi kembali menggunakan sumber data yang benar.
+
+## 5. Verifikasi
+
+### 5.1 Pemeriksaan TypeScript
+
+Perintah:
 
 ```bash
 npx tsc --noEmit
 ```
 
-**Hasil:** Perintah selesai tanpa menampilkan pesan error pada terminal.
+Hasil: perintah selesai tanpa menampilkan pesan error pada terminal yang dilaporkan.
 
-Hasil tersebut menunjukkan bahwa pemeriksaan tipe TypeScript tidak melaporkan kesalahan pada saat pengujian dilakukan.
+### 5.2 Pemeriksaan ESLint
 
-### 6.2 Pemeriksaan ESLint
-
-Perintah yang dijalankan:
+Perintah:
 
 ```bash
 npm run lint
 ```
 
-**Hasil:** ESLint selesai dijalankan tanpa menampilkan pesan error atau peringatan pada output terminal yang diperoleh.
+Hasil: ESLint selesai dijalankan tanpa menampilkan pesan error pada output terminal yang dilaporkan.
 
-### 6.3 Bukti Pengujian
+**Bukti verifikasi:**  
 
-Bukti pengujian dilengkapi dengan screenshot terminal yang memperlihatkan kedua perintah beserta outputnya.
+<img src="bukti/verifikasi_typescript_ESLint.png" alt="Bukti verifikasi TypeScript dan ESLint" width="700">
 
-Hasil pengujian berlaku untuk kondisi kode pada saat kedua perintah dijalankan. Jika terdapat perubahan kode setelah pengujian, pemeriksaan perlu dijalankan kembali.
+Pemeriksaan tersebut berlaku untuk kondisi kode ketika perintah dijalankan. Jika terdapat perubahan kode setelah pengujian, jalankan kembali kedua perintah tersebut.
 
-### 6.4 Pengujian Fungsional
+## 6. Kendala dan Penyelesaian
 
-Skenario berikut dapat digunakan untuk mendokumentasikan pengujian manual pada aplikasi.
+Salah satu hal yang perlu diperhatikan adalah konsistensi tipe data dan kategori item. Penggunaan union type `Kategori` membatasi nilai kategori yang diperbolehkan, sedangkan interface `Item` memastikan struktur data sesuai dengan tipe yang ditentukan.
 
-| Skenario | Hasil yang diharapkan | Hasil aktual |
-|---|---|---|
-| Membuka halaman beranda | Halaman beranda tampil | Isi setelah pengujian |
-| Membuka halaman `/katalog` | Halaman dapat diakses | Isi setelah pengujian |
-| Mencari judul item yang tersedia | Daftar menyesuaikan kata kunci | Isi setelah pengujian |
-| Memilih kategori energi | Hanya item kategori energi yang sesuai ditampilkan | Isi setelah pengujian |
-| Memilih kategori semua | Semua item yang sesuai kata kunci ditampilkan | Isi setelah pengujian |
-| Mencari item yang tidak tersedia dalam daftar | Pesan tidak ada item yang sesuai ditampilkan | Isi setelah pengujian |
+Pada bagian interaksi, pencarian dan filter membutuhkan perubahan state berdasarkan tindakan pengguna. Penggunaan `useState`, event `onChange`, dan event `onClick` memungkinkan daftar diperbarui sesuai kata kunci dan kategori yang dipilih.
 
-Kolom hasil aktual harus diperbarui berdasarkan pengujian yang benar-benar dilakukan. Screenshot aplikasi dapat ditambahkan sebagai bukti pendukung.
+Pemetaan label kategori menggunakan `Record<Kategori, string>` agar setiap kategori mempunyai label yang sesuai dengan definisi tipe. Selain itu, penggunaan `key={item.id}` membantu React mengidentifikasi item pada daftar.
 
-## 7. Kendala dan Penyelesaian
+Untuk pengambilan data, implementasi yang diperiksa masih menggunakan array statis dari `lib/data.ts`. Dokumentasi disesuaikan dengan implementasi tersebut dan tidak menyatakan bahwa Fetch API sudah diuji.
 
-Salah satu hal yang perlu diperhatikan dalam pengembangan adalah menjaga kesesuaian antara tipe data, props, dan interaksi pengguna.
+## 7. Catatan Pemanfaatan AI
 
-Penggunaan union type `Kategori` membantu membatasi nilai kategori yang valid. Interface `Item` memastikan struktur data memiliki properti dan tipe yang ditentukan. Sementara itu, `Record<Kategori, string>` membantu menjaga pemetaan label kategori agar sesuai dengan definisi tipe.
+**Alat yang digunakan:** ChatGPT.
 
-Pada bagian interaksi, penggunaan `useState` memungkinkan perubahan pencarian dan filter diperbarui secara langsung. Penggunaan `key`, `aria-pressed`, dan `aria-live` juga mendukung rendering daftar serta aksesibilitas.
+**Perintah atau prompt utama:** Meminta bantuan untuk memahami tipe data TypeScript, struktur komponen React, alur `useState`, pencarian dan filter, serta penyusunan dokumentasi teknis Modul 3.
 
-Untuk pengambilan data, implementasi yang diperiksa masih menggunakan array statis dari `lib/data.ts`. Oleh karena itu, dokumentasi tidak menyatakan bahwa Fetch API telah diuji.
+**Bagian yang digunakan:** Bantuan penjelasan union type, interface, `Record`, props komponen, alur event hingga rendering ulang, dan penyusunan skenario pengujian.
 
-## 8. Catatan Pemanfaatan AI
+**Cara verifikasi:** Penjelasan AI dibandingkan dengan kode proyek. Pemeriksaan TypeScript dilakukan melalui `npx tsc --noEmit`, sedangkan pemeriksaan lint dilakukan melalui `npm run lint`. Kedua perintah tersebut selesai tanpa menampilkan pesan error pada output yang dilaporkan. Pengujian interaksi dan screenshot tetap perlu diperoleh langsung dari aplikasi.
 
-AI digunakan sebagai alat bantu untuk memahami struktur TypeScript dan React, menjelaskan penggunaan union type, interface, `Record`, props, serta `useState`, dan membantu menyusun dokumentasi teknis.
-
-AI juga digunakan untuk membantu mengidentifikasi bagian dokumentasi yang perlu dilengkapi dan menyusun penjelasan berdasarkan kode yang diberikan.
-
-Saran dari AI tetap perlu diperiksa terhadap kode aktual. Pemeriksaan TypeScript dan ESLint dilakukan melalui terminal proyek, sedangkan pengujian fungsional dan screenshot perlu berasal dari aplikasi yang benar-benar dijalankan.
-
-## 9. Kesimpulan
-
-Project Sistem Pemantauan Energi & Lingkungan Kampus telah menerapkan dasar TypeScript dan React melalui penggunaan union type, interface, props bertipe, `Record`, komponen yang dapat digunakan kembali, serta `useState` untuk fitur pencarian dan filter.
-
-Pemeriksaan TypeScript dan ESLint telah dijalankan tanpa menampilkan pesan error pada output yang tersedia. Data item yang diperiksa masih berasal dari `lib/data.ts`, dan implementasi Fetch API belum dinyatakan selesai.
-
-Dokumentasi akhir perlu dilengkapi dengan bukti pengujian aktual serta penyesuaian terhadap ketentuan asisten praktikum dan instruksi resmi Modul 3.
+AI digunakan sebagai alat bantu memahami kode dan menyusun dokumentasi. Hasilnya diperiksa kembali agar sesuai dengan implementasi proyek dan instruksi praktikum.
