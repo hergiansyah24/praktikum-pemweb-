@@ -1,6 +1,7 @@
 # Dokumen Teknis Modul 3 — TypeScript dan Komponen React
 
 **Nama/NIM:** Rizqy hergiansyah / 105224010 
+
 **Repositori:** https://github.com/hergiansyah24/praktikum-pemweb-/tree/main/week-3
 
 ## 1. Tipe Data Produk
